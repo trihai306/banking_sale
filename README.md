@@ -10,7 +10,7 @@ pinned: false
 hf_oauth: true
 hf_oauth_scopes:
 - inference-api
-short_description: Ứng dụng tư vấn ngân hàng với hỗ trợ giọng nói (STT → LLM → TTS)
+short_description: Tư vấn ngân hàng với voice chat (STT→LLM→TTS)
 ---
 
 # 🏦 Banking Sale Voice Chat
