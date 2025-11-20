@@ -474,4 +474,5 @@ if __name__ == "__main__":
     if model is None or tokenizer is None or whisper_model is None:
         print("⚠️ Cảnh báo: Một số models chưa được tải. App vẫn sẽ chạy nhưng có thể gặp lỗi.")
     
-    demo.launch(server_name="0.0.0.0", server_port=7860, share=False)
+    # Hugging Face Spaces sẽ tự động xử lý server configuration
+    demo.launch()
