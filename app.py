@@ -320,6 +320,7 @@ with gr.Blocks(title="Bank Model Voice Chat", theme=gr.themes.Soft()) as demo:
                 label="Chat",
                 height=500,
                 show_copy_button=True,
+                type="messages",
             )
             
             with gr.Row():
