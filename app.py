@@ -43,8 +43,21 @@ def load_models():
         print(f"Lỗi khi tải model: {e}")
         return False
 
-# Load models
-load_models()
+# Load models - Đợi tải xong trước khi tiếp tục
+print("=" * 50)
+print("BẮT ĐẦU TẢI MODELS...")
+print("=" * 50)
+
+models_loaded = load_models()
+
+if models_loaded:
+    print("=" * 50)
+    print("✅ TẤT CẢ MODELS ĐÃ ĐƯỢC TẢI THÀNH CÔNG!")
+    print("=" * 50)
+else:
+    print("=" * 50)
+    print("⚠️ CẢNH BÁO: CÓ LỖI KHI TẢI MODELS!")
+    print("=" * 50)
 
 # System message mặc định
 DEFAULT_SYSTEM_MESSAGE = "You are a helpful banking and finance assistant specialized in providing financial advice and banking services information. Respond in Vietnamese when the user speaks Vietnamese."
@@ -472,8 +485,32 @@ with gr.Blocks(title="Bank Model Voice Chat", theme=gr.themes.Soft()) as demo:
 
 if __name__ == "__main__":
     # Kiểm tra models đã được load chưa
+    print("\n" + "=" * 50)
+    print("KIỂM TRA TRẠNG THÁI MODELS...")
+    print("=" * 50)
+    
+    if model is None:
+        print("❌ Model LLM chưa được tải!")
+    else:
+        print("✅ Model LLM đã sẵn sàng")
+    
+    if tokenizer is None:
+        print("❌ Tokenizer chưa được tải!")
+    else:
+        print("✅ Tokenizer đã sẵn sàng")
+    
+    if whisper_model is None:
+        print("❌ Whisper model chưa được tải!")
+    else:
+        print("✅ Whisper model đã sẵn sàng")
+    
     if model is None or tokenizer is None or whisper_model is None:
-        print("⚠️ Cảnh báo: Một số models chưa được tải. App vẫn sẽ chạy nhưng có thể gặp lỗi.")
+        print("\n⚠️ CẢNH BÁO: Một số models chưa được tải. App vẫn sẽ chạy nhưng có thể gặp lỗi.")
+        print("Vui lòng đợi models được tải xong hoặc refresh trang.")
+    else:
+        print("\n✅ TẤT CẢ MODELS ĐÃ SẴN SÀNG! Đang khởi động ứng dụng...")
+    
+    print("=" * 50 + "\n")
     
     # Hugging Face Spaces sẽ tự động xử lý server configuration
     demo.launch()
