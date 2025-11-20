@@ -16,20 +16,35 @@ import os
 MODEL_NAME = "hainguyen306201/bank-model"
 
 # Khởi tạo model và tokenizer một lần khi app khởi động
-print("Đang tải model bank-model...")
-model = AutoModelForCausalLM.from_pretrained(
-    MODEL_NAME,
-    low_cpu_mem_usage=True,
-    torch_dtype=torch.bfloat16,
-    device_map="auto"
-)
-tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, trust_remote_code=True)
-print("Model đã được tải thành công!")
+model = None
+tokenizer = None
+whisper_model = None
 
-# Load Whisper model cho STT
-print("Đang tải Whisper model cho STT...")
-whisper_model = whisper.load_model("base")
-print("Whisper model đã được tải thành công!")
+def load_models():
+    """Load tất cả models"""
+    global model, tokenizer, whisper_model
+    try:
+        print("Đang tải model bank-model...")
+        model = AutoModelForCausalLM.from_pretrained(
+            MODEL_NAME,
+            low_cpu_mem_usage=True,
+            torch_dtype=torch.bfloat16,
+            device_map="auto"
+        )
+        tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, trust_remote_code=True)
+        print("Model đã được tải thành công!")
+        
+        # Load Whisper model cho STT
+        print("Đang tải Whisper model cho STT...")
+        whisper_model = whisper.load_model("base")
+        print("Whisper model đã được tải thành công!")
+        return True
+    except Exception as e:
+        print(f"Lỗi khi tải model: {e}")
+        return False
+
+# Load models
+load_models()
 
 # System message mặc định
 DEFAULT_SYSTEM_MESSAGE = "You are a helpful banking and finance assistant specialized in providing financial advice and banking services information. Respond in Vietnamese when the user speaks Vietnamese."
@@ -41,6 +56,9 @@ def speech_to_text(audio):
     """
     if audio is None:
         return None
+    
+    if whisper_model is None:
+        return "Lỗi: Whisper model chưa được tải. Vui lòng đợi..."
     
     try:
         # Whisper xử lý audio file
@@ -63,6 +81,10 @@ def generate_response_stream(
     """
     LLM: Tạo response từ LLM với streaming
     """
+    if model is None or tokenizer is None:
+        yield "Lỗi: Model chưa được tải. Vui lòng đợi hoặc refresh trang..."
+        return
+    
     # Chuẩn bị messages
     messages = []
     if system_message:
@@ -448,4 +470,8 @@ with gr.Blocks(title="Bank Model Voice Chat", theme=gr.themes.Soft()) as demo:
 
 
 if __name__ == "__main__":
-    demo.launch()
+    # Kiểm tra models đã được load chưa
+    if model is None or tokenizer is None or whisper_model is None:
+        print("⚠️ Cảnh báo: Một số models chưa được tải. App vẫn sẽ chạy nhưng có thể gặp lỗi.")
+    
+    demo.launch(server_name="0.0.0.0", server_port=7860, share=False)
