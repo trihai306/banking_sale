@@ -3,4 +3,9 @@ transformers>=4.51.0
 torch
 accelerate
 huggingface_hub
+openai-whisper
+edge-tts
+numpy
+scipy
+pydub
 
