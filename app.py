@@ -5,10 +5,10 @@ from threading import Thread
 
 
 # Load model và tokenizer
-MODEL_NAME = "WeiboAI/VibeThinker-1.5B"
+MODEL_NAME = "Qwen/Qwen3-4B-Instruct-2507"
 
 # Khởi tạo model và tokenizer một lần khi app khởi động
-print("Đang tải model VibeThinker-1.5B...")
+print("Đang tải model Qwen3-4B-Instruct-2507...")
 model = AutoModelForCausalLM.from_pretrained(
     MODEL_NAME,
     low_cpu_mem_usage=True,
@@ -29,8 +29,8 @@ def respond(
     hf_token: gr.OAuthToken,
 ):
     """
-    Hàm xử lý chat với model VibeThinker-1.5B
-    Model này được tối ưu cho các bài toán toán học và lập trình cạnh tranh
+    Hàm xử lý chat với model Qwen3-4B-Instruct-2507
+    Model này có khả năng hiểu ngữ cảnh dài (256K tokens) và hỗ trợ đa ngôn ngữ
     """
     # Chuẩn bị messages
     messages = []
@@ -53,13 +53,14 @@ def respond(
     # Tokenize input
     model_inputs = tokenizer([text], return_tensors="pt").to(model.device)
     
-    # Cấu hình generation theo khuyến nghị của model
+    # Cấu hình generation theo khuyến nghị của Qwen3-4B-Instruct-2507
+    # Khuyến nghị: Temperature=0.7, TopP=0.8, TopK=20, MinP=0, max_new_tokens=16384
     generation_config = GenerationConfig(
-        max_new_tokens=min(max_tokens, 40960),  # Giới hạn tối đa 40960 theo khuyến nghị
+        max_new_tokens=min(max_tokens, 16384),  # Giới hạn tối đa 16384 theo khuyến nghị
         do_sample=True,
         temperature=temperature,
         top_p=top_p,
-        top_k=None,  # Bỏ qua top_k theo khuyến nghị
+        top_k=20,  # Khuyến nghị TopK=20
     )
     
     # Tạo streamer để stream response theo thời gian thực
@@ -92,33 +93,33 @@ chatbot = gr.ChatInterface(
     type="messages",
     additional_inputs=[
         gr.Textbox(
-            value="You are a helpful assistant specialized in competitive-style math and algorithm coding problems.", 
+            value="You are a helpful assistant.", 
             label="System message"
         ),
         gr.Slider(
             minimum=1, 
-            maximum=40960, 
-            value=2048, 
+            maximum=16384, 
+            value=16384, 
             step=1, 
             label="Max new tokens"
         ),
         gr.Slider(
             minimum=0.1, 
             maximum=2.0, 
-            value=0.6, 
+            value=0.7, 
             step=0.1, 
-            label="Temperature (khuyến nghị: 0.6 hoặc 1.0)"
+            label="Temperature (khuyến nghị: 0.7)"
         ),
         gr.Slider(
             minimum=0.1,
             maximum=1.0,
-            value=0.95,
+            value=0.8,
             step=0.05,
-            label="Top-p (nucleus sampling)",
+            label="Top-p (khuyến nghị: 0.8)",
         ),
     ],
-    title="VibeThinker-1.5B Chat",
-    description="Model tối ưu cho các bài toán toán học và lập trình cạnh tranh. Khuyến nghị đặt câu hỏi bằng tiếng Anh để có kết quả tốt nhất.",
+    title="Qwen3-4B-Instruct-2507 Chat",
+    description="Model Qwen3-4B-Instruct-2507 với khả năng hiểu ngữ cảnh dài (256K tokens), hỗ trợ đa ngôn ngữ và tối ưu cho nhiều tác vụ khác nhau.",
 )
 
 with gr.Blocks() as demo:
