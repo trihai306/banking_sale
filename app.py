@@ -5,10 +5,10 @@ from threading import Thread
 
 
 # Load model và tokenizer
-MODEL_NAME = "Qwen/Qwen3-4B-Instruct-2507"
+MODEL_NAME = "hainguyen306201/bank-model"
 
 # Khởi tạo model và tokenizer một lần khi app khởi động
-print("Đang tải model Qwen3-4B-Instruct-2507...")
+print("Đang tải model bank-model...")
 model = AutoModelForCausalLM.from_pretrained(
     MODEL_NAME,
     low_cpu_mem_usage=True,
@@ -29,8 +29,8 @@ def respond(
     hf_token: gr.OAuthToken,
 ):
     """
-    Hàm xử lý chat với model Qwen3-4B-Instruct-2507
-    Model này có khả năng hiểu ngữ cảnh dài (256K tokens) và hỗ trợ đa ngôn ngữ
+    Hàm xử lý chat với model bank-model
+    Model này được fine-tuned từ Qwen3-4B-Instruct-2507 cho các tác vụ liên quan đến ngân hàng và tài chính
     """
     # Chuẩn bị messages
     messages = []
@@ -53,7 +53,7 @@ def respond(
     # Tokenize input
     model_inputs = tokenizer([text], return_tensors="pt").to(model.device)
     
-    # Cấu hình generation theo khuyến nghị của Qwen3-4B-Instruct-2507
+    # Cấu hình generation theo khuyến nghị của Qwen3-4B-Instruct-2507 (base model)
     # Khuyến nghị: Temperature=0.7, TopP=0.8, TopK=20, MinP=0, max_new_tokens=16384
     generation_config = GenerationConfig(
         max_new_tokens=min(max_tokens, 16384),  # Giới hạn tối đa 16384 theo khuyến nghị
@@ -93,7 +93,7 @@ chatbot = gr.ChatInterface(
     type="messages",
     additional_inputs=[
         gr.Textbox(
-            value="You are a helpful assistant.", 
+            value="You are a helpful banking and finance assistant specialized in providing financial advice and banking services information.", 
             label="System message"
         ),
         gr.Slider(
@@ -118,8 +118,8 @@ chatbot = gr.ChatInterface(
             label="Top-p (khuyến nghị: 0.8)",
         ),
     ],
-    title="Qwen3-4B-Instruct-2507 Chat",
-    description="Model Qwen3-4B-Instruct-2507 với khả năng hiểu ngữ cảnh dài (256K tokens), hỗ trợ đa ngôn ngữ và tối ưu cho nhiều tác vụ khác nhau.",
+    title="Bank Model Chat",
+    description="Model bank-model được fine-tuned từ Qwen3-4B-Instruct-2507, chuyên về tư vấn ngân hàng và tài chính. Hỗ trợ đa ngôn ngữ và ngữ cảnh dài (256K tokens).",
 )
 
 with gr.Blocks() as demo:
